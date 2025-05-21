@@ -1,5 +1,10 @@
 set dotenv-load
 
+NAMESPACE := "$NAMESPACE"
+HF_TOKEN := "$HF_TOKEN"
+GH_TOKEN := "$GH_TOKEN"
+MODEL := "$MODEL"
+
 logs POD:
     kubectl logs -f {{POD}} | grep -v "GET /metrics HTTP/1.1"
 
@@ -18,14 +23,13 @@ get-pods:
 [working-directory: 'llm-d-deployer/quickstart']
 install VALUES="values.yaml":
     ./llmd-installer.sh \
-        --hf-token {{HF_TOKEN}} \
         --namespace {{NAMESPACE}} \
         --storage-class shared-vast --storage-size 300Gi \
         --values-file $PWD/../../{{VALUES}}
 
 start VALUES="values.yaml": 
     just install {{VALUES}} && \
-    just hf-token && \
+    just hf-token {{HF_TOKEN}} && \
     just start-bench
 
 [working-directory: 'llm-d-deployer/quickstart']
@@ -34,7 +38,7 @@ uninstall VALUES="values.yaml":
         --hf-token {{HF_TOKEN}} \
         --namespace {{NAMESPACE}} \
         --storage-class shared-vast  --storage-size 300Gi \
-        --values-file $PWD/../../{{VALUES}}
+        --values-file $PWD/../../{{VALUES}} \
         --uninstall
 
 # Interactive benchmark commands:
